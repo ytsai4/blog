@@ -1,8 +1,8 @@
-import { DisplayEntity } from '@src/modules/_base/entities/display.entity';
+import { AuditBaseEntity } from '@src/common/entities/base.entity';
 import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('PostLog')
-export class PostLogEntity extends DisplayEntity {
+export class PostLogEntity extends AuditBaseEntity {
     @PrimaryGeneratedColumn('uuid', {
         name: 'UUID',
         comment: '文章UUID',
@@ -32,7 +32,4 @@ export class PostLogEntity extends DisplayEntity {
         nullable: true,
     })
     PublishDate: Date | null;
-
-    @Column({ name: 'UpdateDate', type: 'datetime2', comment: '更新時間' })
-    UpdateDate: Date;
 }

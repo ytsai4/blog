@@ -1,8 +1,8 @@
-import { DisplayEntity } from '@src/modules/_base/entities/display.entity';
+import { AuditBaseEntity } from '@src/common/entities/base.entity';
 import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('Post')
-export class PostEntity extends DisplayEntity {
+export class PostEntity extends AuditBaseEntity {
     @PrimaryGeneratedColumn('uuid', {
         name: 'UUID',
         comment: '文章UUID',
@@ -32,13 +32,4 @@ export class PostEntity extends DisplayEntity {
     @Index()
     @Column({ name: 'CreateBy', type: 'uuid', comment: '作者 UUID' })
     CreateBy: string;
-
-    @Column({ name: 'CreateDate', type: 'datetime2', comment: '建立時間' })
-    CreateDate: Date;
-
-    @Column({ name: 'UpdateDate', type: 'datetime2', comment: '更新時間', nullable: true })
-    UpdateDate: Date | null;
-
-    @Column({ name: 'DeleteDate', type: 'datetime2', comment: '刪除時間', nullable: true })
-    DeleteDate: Date | null;
 }

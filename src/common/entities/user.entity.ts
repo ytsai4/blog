@@ -1,9 +1,9 @@
 import { BeforeInsert, BeforeUpdate, Column, Entity, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { BaseEntity } from '@src/modules/_base/entities/base.entity';
+import { AuditBaseEntity } from './base.entity';
 
 @Entity('User')
-export class UserEntity extends BaseEntity {
+export class UserEntity extends AuditBaseEntity {
     @PrimaryGeneratedColumn('uuid', {
         name: 'UUID',
         comment: '使用者UUID',
@@ -54,20 +54,13 @@ export class UserEntity extends BaseEntity {
 
     @Column({ name: 'LastLoginDate', type: 'timestamp', nullable: true })
     LastLoginDate: Date | null;
-
     @Column({ name: 'LastChangePwdDate', type: 'timestamp', nullable: true })
     LastChangePwdDate: Date | null;
     @Column({ name: 'CreateBy', type: 'uuid', comment: '作者 UUID' })
     CreateBy: string;
-
-    @Column({ name: 'CreateDate', type: 'datetime2', comment: '建立時間' })
-    CreateDate: Date;
-
     @Column({ name: 'DeleteBy', type: 'uuid', comment: '刪除者', nullable: true })
     DeleteBy: string;
 
-    @Column({ name: 'DeleteDate', type: 'datetime2', comment: '刪除時間', nullable: true })
-    DeleteDate: Date;
     @BeforeInsert()
     @BeforeUpdate()
     async setPassword?(password: string) {

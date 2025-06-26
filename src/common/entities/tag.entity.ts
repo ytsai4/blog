@@ -1,7 +1,8 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { AuditBaseEntity } from './base.entity';
 
 @Entity('Tag')
-export class TagEntity {
+export class TagEntity extends AuditBaseEntity {
     @PrimaryGeneratedColumn('uuid', {
         name: 'UUID',
         comment: '標籤UUID',

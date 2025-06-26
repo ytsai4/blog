@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
-import { IsDateString } from 'class-validator';
+import { IsOptional, IsString, IsDateString, MaxLength } from 'class-validator';
 
 export class CreatePostDto {
     @ApiProperty({ description: '標題', maxLength: 200 })
