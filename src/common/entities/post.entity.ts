@@ -1,5 +1,6 @@
 import { AuditBaseEntity } from '@src/common/entities/base.entity';
-import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
+import { PostTagEntity } from '@src/module/post/entities';
+import { Column, Entity, Index, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('Post')
 export class PostEntity extends AuditBaseEntity {
@@ -32,4 +33,7 @@ export class PostEntity extends AuditBaseEntity {
     @Index()
     @Column({ name: 'CreateBy', type: 'uuid', comment: '作者 UUID' })
     CreateBy: string;
+
+    @OneToMany(() => PostTagEntity, (postTag) => postTag.Post)
+    PostTags: PostTagEntity[];
 }

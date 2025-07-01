@@ -1,17 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class PostDto {
-    @ApiProperty({ description: '文章UUID' })
+export class CommentDto {
+    @ApiProperty({ description: '留言UUID' })
     UUID: string;
-
-    @ApiProperty({ description: '標題' })
-    Title: string;
 
     @ApiProperty({ description: '內文' })
     Content: string;
-
-    @ApiProperty({ description: '發布時間', type: String, format: 'date-time', nullable: true })
-    PublishDate: Date | null;
 
     @ApiProperty({ description: '作者 UUID' })
     CreateBy: string;

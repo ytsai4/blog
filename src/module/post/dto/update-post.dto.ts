@@ -1,7 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional, IsString, IsDateString, MaxLength, IsArray } from 'class-validator';
 
-export class CreatePostDto {
+export class UpdatePostDto {
+    @ApiProperty({ description: '文章UUID' })
+    UUID: string;
+
     @ApiProperty({ description: '標題', maxLength: 200 })
     @IsString()
     @MaxLength(200)

@@ -15,142 +15,49 @@ import {
     QueryRunner,
     Repository,
 } from 'typeorm';
-import { PostTagEntity } from './entities/post-tag.entity';
-
-import { PostDto } from './dto/post.dto';
-import { TagEntity } from '@src/common/entities/tag.entity';
+import { CommentEntity } from './entities/comment.entity';
+import { CommentDto } from './dto/comment.dto';
 import { mapToDto } from '@src/common/utils/mapper';
-import { PostTagLogEntity } from './entities/post-tag-log.entity';
-import { PostLogEntity } from './entities/post-log.entity';
-import { GetPostDto } from './dto/get-post.dto';
-import { UpdatePostDto } from './dto/update-post.dto';
-import { CreatePostDto } from './dto/create-post.dto';
-import { LikeEntity } from './entities';
+
 @Injectable()
-export class PostService {
+export class CommentService {
     constructor(
         private dataSource: DataSource,
-        @InjectRepository(PostEntity)
-        private readonly postRepo: Repository<PostEntity>,
-
-        @InjectRepository(PostTagEntity)
-        private readonly postTagRepo: Repository<PostTagEntity>,
-
-        @InjectRepository(PostLogEntity)
-        private readonly postLogRepo: Repository<PostLogEntity>,
-
-        @InjectRepository(PostTagLogEntity)
-        private readonly postTagLogRepo: Repository<PostTagLogEntity>,
-
-        @InjectRepository(TagEntity)
-        private readonly tagRepo: Repository<TagEntity>,
-        @InjectRepository(LikeEntity)
-        private readonly likeRepo: Repository<LikeEntity>,
+        @InjectRepository(CommentEntity)
+        private readonly commentRepo: Repository<CommentEntity>,
     ) {}
-    async getPostByTagId(tagIds: string[]): Promise<string[]> {
-        const posts = await this.postTagRepo.find({
-            where: {
-                Tag: In(tagIds),
-            },
-            select: ['Post'],
-        });
-        const postIdSet = new Set<string>();
-        for (const post of posts) {
-            postIdSet.add(post.Post);
-        }
-        return Array.from(postIdSet);
-    }
-    async getALlPosts(body: GetPostDto): Promise<PostDto[]> {
-        const { Limit, Offset, Tag, Author, KeyWord } = body;
-        const where: FindOptionsWhere<PostEntity>[] = [];
-        const baseWhere: FindOptionsWhere<PostEntity> = {
+
+    async getFiveByPost(Post: string): Promise<CommentDto[]> {
+        const where: FindOptionsWhere<CommentEntity> = {
             DeleteDate: IsNull(),
-            PublishDate: LessThanOrEqual(new Date()),
+            Post,
         };
-        if (Author) {
-            where.push({
-                ...baseWhere,
-                CreateBy: Author,
-            });
-        }
-        if (KeyWord) {
-            where.push({
-                ...baseWhere,
-                Title: And(Not(IsNull()), Like(`%${KeyWord}%`)),
-            });
-        }
-        if (Tag) {
-            const posts = await this.getPostByTagId(Tag);
-            where.push({
-                ...baseWhere,
-                UUID: In(posts),
-            });
-        }
-        if (where.length === 0) {
-            where.push(baseWhere);
-        }
-        const queryOptions: FindManyOptions<PostEntity> = {
+        const queryOptions: FindManyOptions<CommentEntity> = {
             where,
             order: {
-                PublishDate: 'DESC',
+                CreateDate: 'DESC',
             },
+            take: 5,
         };
-        const total = await this.postRepo.count(queryOptions);
-        // Conditionally add pagination
-        if (Limit !== undefined && Limit > 0) {
-            queryOptions.take = Limit;
-            if (Offset !== undefined && Offset >= 0 && Offset < total) {
-                queryOptions.skip = Offset;
-            }
-        }
-        const postEntities = await this.postRepo.find(queryOptions);
 
-        const outputData: PostDto[] = postEntities.map((post) => mapToDto(PostDto, post));
+        const commentEntities = await this.commentRepo.find(queryOptions);
 
-        return { Data: outputData, Meta: { Total: total, Limit, Offset } };
-    }
-    async getPostByUUID(UUID: string): Promise<PostDto> {
-        const where: FindOptionsWhere<PostEntity> = {
-            DeleteDate: IsNull(),
-            PublishDate: LessThanOrEqual(new Date()),
-            UUID,
-        };
-        const queryOptions: FindManyOptions<PostEntity> = {
-            where,
-            order: {
-                PublishDate: 'DESC',
-            },
-        };
-        const postEntity = await this.postRepo.findOne(queryOptions);
-
-        const outputData: PostDto = mapToDto(PostDto, postEntity);
+        const outputData: CommentDto[] = commentEntities.map((comment) => mapToDto(CommentDto, comment));
 
         return outputData;
     }
-    hashString(value: string | undefined | null): string {
-        return createHash('sha256')
-            .update(value || '')
-            .digest('hex');
+    async getByUUID(UUID: string): Promise<CommentDto> {
+        const commentEntity = await this.commentRepo.findOne({
+            where: {
+                DeleteDate: IsNull(),
+                UUID,
+            },
+        });
+        const outputData: CommentDto = mapToDto(CommentDto, commentEntity);
+
+        return outputData;
     }
-    comparePostChange(oldPost: PostLogEntity, newPost: Partial<PostEntity>): boolean {
-        if (
-            oldPost.Title !== newPost.Title ||
-            (oldPost.PublishDate?.toISOString() ?? null) !== (newPost.PublishDate?.toISOString() ?? null) ||
-            this.hashString(oldPost.Content) !== this.hashString(newPost.Content)
-        ) {
-            return true;
-        }
-        return false;
-    }
-    compareTagChange(oldTags: string[], newTags: string[]): boolean {
-        const oldTagIds = new Set(oldTags);
-        const newTagIds = new Set(newTags);
-        if (oldTagIds.size !== newTagIds.size) return true;
-        for (const tag of oldTags) {
-            if (!newTagIds.has(tag)) return true;
-        }
-        return false;
-    }
+
     /**
      * 更新文章
      * @param body

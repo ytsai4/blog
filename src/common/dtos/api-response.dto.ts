@@ -1,5 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from '@nestjs/common';
+
+export class MetaDto {
+    @ApiProperty({ example: 137, required: false })
+    total?: number;
+
+    @ApiProperty({ example: 10, required: false })
+    limit?: number;
+
+    @ApiProperty({ example: 0, required: false })
+    offset?: number;
+}
 export class ApiResponseDto<TData> {
     @ApiProperty({ example: 200 })
     Code: number;
@@ -12,12 +23,6 @@ export class ApiResponseDto<TData> {
 
     @ApiProperty()
     Data: TData;
-}
-
-export function ApiResponse<T>(dataModel: Type<T>) {
-    class ApiResponseClass extends ApiResponseDto<T> {
-        @ApiProperty({ type: dataModel })
-        Data: T;
-    }
-    return ApiResponseClass;
+    @ApiProperty({ type: MetaDto, required: false })
+    Meta?: MetaDto;
 }

@@ -1,4 +1,5 @@
-import { Entity, PrimaryColumn } from 'typeorm';
+import { PostEntity, TagEntity } from '@src/common/entities';
+import { Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 
 @Entity('PostTag')
 export class PostTagEntity {
@@ -14,4 +15,11 @@ export class PostTagEntity {
         comment: '標籤UUID',
     })
     Tag: string;
+    @ManyToOne(() => PostEntity, (post) => post.PostTags, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'PostId' })
+    Post: PostEntity;
+
+    @ManyToOne(() => TagEntity, (tag) => tag.PostTags, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'TagId' })
+    Tag: TagEntity;
 }

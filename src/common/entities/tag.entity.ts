@@ -1,5 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { AuditBaseEntity } from './base.entity';
+import { PostTagEntity } from '@src/module/post/entities';
 
 @Entity('Tag')
 export class TagEntity extends AuditBaseEntity {
@@ -15,4 +16,6 @@ export class TagEntity extends AuditBaseEntity {
         comment: '標籤名稱',
     })
     TagName: string;
+    @OneToMany(() => PostTagEntity, (postTag) => postTag.Tag)
+    PostTags: PostTagEntity[];
 }
