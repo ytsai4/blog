@@ -10,7 +10,7 @@ import { createApiResponse } from '@src/common/utils/api-response.util';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { GetPostDto } from './dto/get-post.dto';
 import { PostWithComments, PostWithLikes } from './interfaces/post.interface';
-import { CommentService } from '../comment/comment.service';
+import { CommentService } from '../tag/tag.service';
 import { ApiStandardErrors } from '@src/common/decorators/swagger-api-errors.decorator';
 
 @ApiBearerAuth('access-token')
@@ -59,6 +59,7 @@ export class PostController {
     })
     @ApiResponse({ type: ApiResponseDto<PostDto>, description: '建立文章成功' })
     async create(@Req() req: RequestWithUUID, @Body() body: CreatePostDto): Promise<ApiResponseDto<PostDto>> {
+        console.log('req', req.UUID_User);
         const post = await this.postService.create(body, req.UUID_User);
 
         return createApiResponse(post);

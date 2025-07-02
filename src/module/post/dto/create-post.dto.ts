@@ -11,11 +11,10 @@ export class CreatePostDto {
     @IsString()
     @MaxLength(4000)
     Content: string;
-
     @ApiProperty({ description: '發布時間', required: false, type: String, format: 'date-time' })
     @IsOptional()
     @IsDateString()
-    PublishDate?: Date;
+    PublishDate?: string;
     @ApiProperty({
         description: '標籤UUID陣列',
         required: false,

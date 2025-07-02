@@ -8,6 +8,7 @@ import { RequestWithUUID } from '@src/common/interfaces/request.interface';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiStandardErrors } from '@src/common/decorators/swagger-api-errors.decorator';
+import { mapToDto } from '@src/common/utils/mapper';
 @ApiBearerAuth('access-token')
 @ApiTags('使用者')
 @Controller('User')
@@ -41,6 +42,7 @@ export class UserController {
     @ApiStandardErrors()
     async getOne(@Req() req: RequestWithUUID): Promise<ApiResponseDto<UserDto>> {
         const user = await this.userService.getByUUID(req.UUID_User);
-        return createApiResponse(user);
+        const outputData: UserDto = mapToDto(UserDto, user);
+        return createApiResponse(outputData);
     }
 }

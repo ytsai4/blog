@@ -64,8 +64,16 @@ export class UserEntity extends AuditBaseEntity {
     @BeforeUpdate()
     async setPassword?(password: string) {
         if (this.Password) {
-            const salt = await bcrypt.genSalt();
-            this.Password = await bcrypt.hash(password || this.Password, salt);
+            // Check if password looks like a bcrypt hash (starts with $2a$, $2b$, or $2y$)
+            const isHashed =
+                this.Password.startsWith('$2a$') ||
+                this.Password.startsWith('$2b$') ||
+                this.Password.startsWith('$2y$');
+
+            if (!isHashed) {
+                const salt = await bcrypt.genSalt();
+                this.Password = await bcrypt.hash(password || this.Password, salt);
+            }
         }
     }
 }

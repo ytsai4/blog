@@ -4,8 +4,8 @@ import { PostController } from './post.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PostEntity, TagEntity } from '@src/common/entities';
 import { PostLogEntity, PostTagLogEntity, PostTagEntity, LikeEntity } from './entities';
-import { CommentService } from '../comment/comment.service';
-import { CommentEntity } from '../comment/entities/comment.entity';
+import { CommentService } from '../tag/tag.service';
+import { CommentEntity } from '../tag/entities/comment.entity';
 
 @Module({
     imports: [

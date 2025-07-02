@@ -8,6 +8,7 @@ import { AuthModule } from './module/auth/auth.module';
 import { UserModule } from './module/user/user.module';
 import { PostModule } from './module/post/post.module';
 import { CommentModule } from './module/comment/comment.module';
+import { TagModule } from './module/tag/tag.module';
 import { databaseConfigAsync } from './config/typeorm.config';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { APP_PIPE } from '@nestjs/core';
@@ -24,6 +25,7 @@ import { AllExceptionsFilter } from './common/filters/http-exception.filter';
         UserModule,
         PostModule,
         CommentModule,
+        TagModule,
     ],
     controllers: [AppController],
     providers: [
