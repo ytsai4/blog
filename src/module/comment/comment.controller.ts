@@ -28,7 +28,7 @@ export class CommentController {
         return createApiResponse(comment);
     }
 
-    @Delete('')
+    @Delete(':UUID')
     @ApiOperation({ summary: '刪除留言' })
     @ApiParam({
         name: 'UUID',

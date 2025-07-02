@@ -3,13 +3,13 @@ import { Type } from '@nestjs/common';
 
 export class MetaDto {
     @ApiProperty({ example: 137, required: false })
-    total?: number;
+    Total?: number;
 
     @ApiProperty({ example: 10, required: false })
-    limit?: number;
+    Limit?: number;
 
     @ApiProperty({ example: 0, required: false })
-    offset?: number;
+    Offset?: number;
 }
 export class ApiResponseDto<TData> {
     @ApiProperty({ example: 200 })
