@@ -12,7 +12,7 @@ class TypeOrmConfig {
             database: configService.get<string>('MARIADB.Database'),
             timezone: '+08:00', // Asia/Taipei 時區
             subscribers: ['dist/**/*.subscriber{.ts,.js}'],
-            synchronize: configService.get('NodeEnv') === 'development', 
+            // synchronize: configService.get('NodeEnv') === 'development',
             logging: configService.get('NodeEnv') === 'development' ? ['error', 'warn'] : false,
             autoLoadEntities: true,
             extra: {
@@ -30,4 +30,3 @@ export const databaseConfigAsync: TypeOrmModuleAsyncOptions = {
         TypeOrmConfig.getDatabaseConfig(configService),
     inject: [ConfigService],
 };
-
