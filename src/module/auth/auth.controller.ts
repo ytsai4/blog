@@ -6,6 +6,7 @@ import { LoginDto } from './dto/log-in.dto';
 import { ApiResponseDto } from '@src/common/dtos/api-response.dto';
 import { createApiResponse } from '@src/common/utils/api-response.util';
 import { Token } from '@src/common/interfaces/request.interface';
+import { ApiStandardErrors } from '@src/common/decorators/swagger-api-errors.decorator';
 
 @Public()
 @Controller('auth')
@@ -17,6 +18,7 @@ export class AuthController {
     @ApiOperation({ summary: '使用者登入認證，成功後回傳token' })
     @ApiBody({ type: LoginDto })
     @ApiResponse({ type: ApiResponseDto<Token> })
+    @ApiStandardErrors()
     async authentication(@Body() data: LoginDto): Promise<ApiResponseDto<Token>> {
         const res = await this.authService.userAuthentication(data);
         return createApiResponse(res);
@@ -26,6 +28,7 @@ export class AuthController {
     @ApiOperation({ summary: '註冊使用者' })
     @ApiBody({ type: LoginDto })
     @ApiResponse({ type: ApiResponseDto<Token> })
+    @ApiStandardErrors()
     async create(@Body() data: LoginDto): Promise<ApiResponseDto<Token>> {
         const res = await this.authService.create(data);
         return createApiResponse(res);

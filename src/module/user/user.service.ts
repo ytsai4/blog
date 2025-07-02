@@ -50,8 +50,8 @@ export class UserService {
         if (duplicate) {
             throw new HttpException(`帳號已存在`, HttpStatus.CONFLICT);
         }
-        const user = this.userRepo.create({ ...data, CreateBy: 'system' });
-        user.CreateBy = user.UUID;
+        const user = this.userRepo.create({ ...data, CreateBy: 'System' });
+
         user.LastChangePwdDate = new Date();
         user.LastLoginDate = new Date();
         const result = await this.userRepo.save(user);

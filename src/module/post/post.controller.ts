@@ -11,6 +11,7 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { GetPostDto } from './dto/get-post.dto';
 import { PostWithComments, PostWithLikes } from './interfaces/post.interface';
 import { CommentService } from '../comment/comment.service';
+import { ApiStandardErrors } from '@src/common/decorators/swagger-api-errors.decorator';
 
 @ApiBearerAuth('access-token')
 @ApiTags('文章')
@@ -31,6 +32,7 @@ export class PostController {
         required: true,
     })
     @ApiResponse({ type: ApiResponseDto<PostWithComments>, description: '取得文章成功' })
+    @ApiStandardErrors()
     async getOne(@Param('UUID') UUID: string): Promise<ApiResponseDto<PostWithComments>> {
         const post = await this.postService.getPostByUUID(UUID);
         const likes = await this.postService.countLikes(UUID);
@@ -44,6 +46,7 @@ export class PostController {
     @ApiOperation({ summary: '取得所有文章' })
     @ApiBody({ type: GetPostDto })
     @ApiResponse({ type: ApiResponseDto<PostWithLikes[]>, description: '取得文章列表成功' })
+    @ApiStandardErrors()
     async getAll(@Body() body: GetPostDto): Promise<ApiResponseDto<PostWithLikes[]>> {
         const { Data, Meta } = await this.postService.getALlPosts(body);
         const output = await this.postService.countLikesGrouped(Data);
@@ -67,6 +70,8 @@ export class PostController {
         description: '文章UUID',
         type: String,
     })
+    @ApiResponse({ type: ApiResponseDto<{ Likes: number }>, description: '按讚/收回讚成功' })
+    @ApiStandardErrors()
     async like(@Req() req: RequestWithUUID, @Param('UUID') UUID: string): Promise<ApiResponseDto<{ Likes: number }>> {
         const Likes = await this.postService.like(UUID, req.UUID_User);
         return createApiResponse({ Likes });
@@ -76,6 +81,8 @@ export class PostController {
     @ApiBody({
         type: UpdatePostDto,
     })
+    @ApiResponse({ type: ApiResponseDto<PostDto>, description: '編輯文章成功' })
+    @ApiStandardErrors()
     async update(@Body() body: UpdatePostDto, @Req() req: RequestWithUUID): Promise<ApiResponseDto<PostDto>> {
         const post = await this.postService.update(body, req.UUID_User);
         return createApiResponse(post);
@@ -87,6 +94,8 @@ export class PostController {
         description: '文章UUID',
         type: String,
     })
+    @ApiResponse({ type: ApiResponseDto<{}>, description: '刪除文章成功' })
+    @ApiStandardErrors()
     async delete(@Req() req: RequestWithUUID, @Param('UUID') UUID: string): Promise<ApiResponseDto<{}>> {
         await this.postService.delete(UUID, req.UUID_User);
         return createApiResponse({});
