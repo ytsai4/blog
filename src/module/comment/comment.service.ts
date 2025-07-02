@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PostEntity } from '../../common/entities/post.entity';
-import { FindManyOptions, FindOptionsWhere, IsNull, Repository } from 'typeorm';
+import { FindManyOptions, FindOptionsWhere, IsNull, MoreThan, Repository } from 'typeorm';
 import { CommentEntity } from './entities/comment.entity';
 import { CommentDto } from './dto/comment.dto';
 import { mapToDto } from '@src/common/utils/mapper';
@@ -64,12 +64,26 @@ export class CommentService {
 
         return outputData;
     }
+    async checkLimit(Post: string, User: string): Promise<void> {
+        const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
 
+        const recentCommentsCount = await this.commentRepo.count({
+            where: {
+                Post,
+                CreateBy: User,
+                CreateDate: MoreThan(fiveMinutesAgo),
+            },
+        });
+        if (recentCommentsCount >= 10) {
+            throw new HttpException('5 分鐘內只能針對同篇文章留言 10 次', HttpStatus.TOO_MANY_REQUESTS);
+        }
+    }
     /**
      * 新增留言
      * @param body
      */
     async create(body: CreateCommentDto, User: string): Promise<CommentDto> {
+        await this.checkLimit(body.Post, User);
         const comment = this.commentRepo.create({ ...body, CreateBy: User });
         const result = await this.commentRepo.save(comment);
         const outputData: CommentDto = mapToDto(CommentDto, result);

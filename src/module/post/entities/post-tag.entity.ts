@@ -17,9 +17,9 @@ export class PostTagEntity {
     Tag: string;
     @ManyToOne(() => PostEntity, (post) => post.PostTags, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'PostId' })
-    Post: PostEntity;
+    Posts: PostEntity;
 
     @ManyToOne(() => TagEntity, (tag) => tag.PostTags, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'TagId' })
-    Tag: TagEntity;
+    Tags: TagEntity;
 }
