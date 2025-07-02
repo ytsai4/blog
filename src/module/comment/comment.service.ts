@@ -1,30 +1,19 @@
 import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
-import { createHash } from 'crypto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PostEntity } from '../../common/entities/post.entity';
-import {
-    And,
-    DataSource,
-    FindManyOptions,
-    FindOptionsWhere,
-    In,
-    IsNull,
-    LessThanOrEqual,
-    Like,
-    Not,
-    QueryRunner,
-    Repository,
-} from 'typeorm';
+import { FindManyOptions, FindOptionsWhere, IsNull, Repository } from 'typeorm';
 import { CommentEntity } from './entities/comment.entity';
 import { CommentDto } from './dto/comment.dto';
 import { mapToDto } from '@src/common/utils/mapper';
+import { CreateCommentDto } from './dto/create-comment.dto';
 
 @Injectable()
 export class CommentService {
     constructor(
-        private dataSource: DataSource,
         @InjectRepository(CommentEntity)
         private readonly commentRepo: Repository<CommentEntity>,
+        @InjectRepository(PostEntity)
+        private readonly postRepo: Repository<PostEntity>,
     ) {}
 
     async getFiveByPost(Post: string): Promise<CommentDto[]> {
@@ -46,6 +35,24 @@ export class CommentService {
 
         return outputData;
     }
+    async getAllByPost(Post: string): Promise<CommentDto[]> {
+        const where: FindOptionsWhere<CommentEntity> = {
+            DeleteDate: IsNull(),
+            Post,
+        };
+        const queryOptions: FindManyOptions<CommentEntity> = {
+            where,
+            order: {
+                CreateDate: 'DESC',
+            },
+        };
+
+        const commentEntities = await this.commentRepo.find(queryOptions);
+
+        const outputData: CommentDto[] = commentEntities.map((comment) => mapToDto(CommentDto, comment));
+
+        return outputData;
+    }
     async getByUUID(UUID: string): Promise<CommentDto> {
         const commentEntity = await this.commentRepo.findOne({
             where: {
@@ -59,122 +66,29 @@ export class CommentService {
     }
 
     /**
-     * 更新文章
+     * 新增留言
      * @param body
      */
-    async update(body: UpdatePostDto): Promise<PostDto> {
-        const { Tags, ...rest } = body;
-        const postWithTags = await this.postRepo.findOne({
-            where: { UUID: rest.UUID },
-            relations: ['PostTags', 'PostTags.Tag'],
-        });
-        if (!postWithTags) {
-            throw new NotFoundException('找不到文章');
-        }
-
-        const oldTagIds = postWithTags.PostTags.map((tag) => tag.Tag);
-        const tagChange = this.compareTagChange(oldTagIds, Tags ?? []);
-
-        const postLog = await this.postLogRepo.findOne({
-            where: { UUID: postWithTags.UUID },
-            order: { CreateDate: 'DESC' },
-        });
-        if (!postLog) {
-            throw new NotFoundException('找不到文章');
-        }
-        const postChange = this.comparePostChange(postLog, rest);
-        if (!postChange && !tagChange) {
-            throw new HttpException('文章沒有變更', HttpStatus.BAD_REQUEST);
-        }
-        await this.dataSource.transaction(async (entityManager) => {
-            const newPostLog = entityManager.create(PostLogEntity, {
-                ...rest,
-            });
-            await entityManager.insert(PostLogEntity, newPostLog);
-
-            if (tagChange) {
-                // Remove old post-tag relations
-                await entityManager.delete(PostTagEntity, {
-                    Post: postWithTags.UUID,
-                });
-                if (Tags && Tags.length > 0) {
-                    // Create new post-tag entities using `.create()` to trigger hooks/defaults
-                    const newPostTags = Tags.map((tagId) =>
-                        entityManager.create(PostTagEntity, {
-                            Post: postWithTags.UUID,
-                            Tag: tagId,
-                        }),
-                    );
-                    await entityManager.insert(PostTagEntity, newPostTags);
-                    // Create post-tag logs (one per tag), again using `.create()`
-                    const newPostTagLogs = Tags.map((tagId) =>
-                        entityManager.create(PostTagLogEntity, {
-                            Post: newPostLog.UUID, // log points to the new PostLog record
-                            Tag: tagId,
-                        }),
-                    );
-                    await entityManager.insert(PostTagLogEntity, newPostTagLogs);
-                }
-            }
-
-            await entityManager.update(PostEntity, rest.UUID, rest);
-        });
-        const post = await this.postRepo.findOne({
-            where: { UUID: rest.UUID },
-        });
-        const outputData: PostDto = mapToDto(PostDto, post);
+    async create(body: CreateCommentDto, User: string): Promise<CommentDto> {
+        const comment = this.commentRepo.create({ ...body, CreateBy: User });
+        const result = await this.commentRepo.save(comment);
+        const outputData: CommentDto = mapToDto(CommentDto, result);
         return outputData;
     }
-    /**
-     * 新增文章
-     * @param body
-     */
-    async create(body: CreatePostDto): Promise<PostDto> {
-        const { Tags, ...rest } = body;
-        const data = await this.dataSource.transaction(async (entityManager) => {
-            const newPost = entityManager.create(PostEntity, rest);
-            const post = await entityManager.save(PostEntity, newPost);
 
-            const newPostLog = entityManager.create(PostLogEntity, {
-                ...rest,
-                Post: post.UUID,
-            });
-            await entityManager.insert(PostLogEntity, newPostLog);
-
-            if (Tags && Tags.length > 0) {
-                // Create new post-tag entities using `.create()` to trigger hooks/defaults
-                const newPostTags = Tags.map((tagId) =>
-                    entityManager.create(PostTagEntity, {
-                        Post: newPost.UUID,
-                        Tag: tagId,
-                    }),
-                );
-                await entityManager.insert(PostTagEntity, newPostTags);
-                // Create post-tag logs (one per tag), again using `.create()`
-                const newPostTagLogs = Tags.map((tagId) =>
-                    entityManager.create(PostTagLogEntity, {
-                        Post: newPostLog.UUID, // log points to the new PostLog record
-                        Tag: tagId,
-                    }),
-                );
-                await entityManager.insert(PostTagLogEntity, newPostTagLogs);
-            }
-
-            return post;
-        });
-
-        const outputData: PostDto = mapToDto(PostDto, data);
-        return outputData;
-    }
-    // like/unlike
-    async like(UUID: string, User: string): Promise<void> {
-        const data = await this.likeRepo.findOne({ where: { Post: UUID, User } });
+    async delete(UUID: string, User: string): Promise<void> {
+        const data = await this.commentRepo.findOne({ where: { UUID, DeleteDate: IsNull() } });
         if (!data) {
-            const newLike = this.likeRepo.create({ Post: UUID, User });
-            await this.likeRepo.save(newLike);
-        } else {
-            await this.likeRepo.delete(data);
+            throw new NotFoundException('找不到留言');
         }
+        const post = await this.postRepo.findOne({ where: { UUID: data.Post, DeleteDate: IsNull() } });
+        if (!post) {
+            throw new NotFoundException('找不到文章');
+        }
+        if (data.CreateBy !== User || post.CreateBy !== User) {
+            throw new HttpException('你沒有權限刪除', HttpStatus.FORBIDDEN);
+        }
+        await this.commentRepo.update({ UUID }, { DeleteDate: new Date(), DeleteBy: User });
         return;
     }
 }
