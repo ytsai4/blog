@@ -22,6 +22,7 @@ export class CommentController {
     }
     @Post('')
     @ApiOperation({ summary: '新增留言' })
+    @ApiBody({ type: CreateCommentDto })
     async create(@Req() req: RequestWithUUID, @Body() body: CreateCommentDto): Promise<ApiResponseDto<CommentDto>> {
         const comment = await this.commentService.create(body, req.UUID_User);
         return createApiResponse(comment);

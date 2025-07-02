@@ -1,4 +1,7 @@
 export interface RequestWithUUID extends Request {
     UUID_User: string;
-    jwtToken: string;
+    Token: string;
+}
+export interface Token {
+    Token: string;
 }
