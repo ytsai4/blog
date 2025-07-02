@@ -27,7 +27,7 @@ export class PostLogEntity extends AuditBaseEntity {
     Content: string;
     @Column({
         name: 'PublishDate',
-        type: 'datetime2',
+        type: 'datetime',
         comment: '發布時間',
         nullable: true,
     })
