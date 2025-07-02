@@ -38,7 +38,6 @@ export class UserEntity extends AuditBaseEntity {
         name: 'Password',
         type: 'nvarchar',
         length: 200,
-        select: false,
         comment: '密碼',
     })
     Password: string;

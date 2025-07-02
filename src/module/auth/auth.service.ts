@@ -20,7 +20,7 @@ export class AuthService {
      * @returns
      */
     private async certificate(payload: any) {
-        return this.jwtService.sign(payload, { secret: process.env.JWT_TOKEN_SECRET });
+        return this.jwtService.sign(payload);
     }
     /**
      * 註冊使用者
@@ -52,6 +52,7 @@ export class AuthService {
         }
 
         const pwdCheck = await bcrypt.compare(Password, user.Password);
+
         if (!pwdCheck) {
             throw new HttpException('密碼錯誤', HttpStatus.FORBIDDEN);
         }
