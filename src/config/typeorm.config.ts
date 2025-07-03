@@ -11,7 +11,7 @@ class TypeOrmConfig {
             password: configService.get<string>('POSTGRES.Password'),
             database: configService.get<string>('POSTGRES.Database'),
             subscribers: ['dist/**/*.subscriber{.ts,.js}'],
-            // synchronize: configService.get('NodeEnv') === 'development',
+            synchronize: configService.get('NodeEnv') === 'development',
             logging: configService.get('NodeEnv') === 'development' ? ['error', 'warn'] : false,
             autoLoadEntities: true,
             extra: {
