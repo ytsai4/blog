@@ -15,11 +15,16 @@ declare const process: {
         MARIADB_PASSWORD: string;
         MARIADB_DATABASE: string;
 
+        POSTGRE_HOST: string;
+        POSTGRE_PORT: string;
+        POSTGRE_USERNAME: string;
+        POSTGRE_PASSWORD: string;
+        POSTGRE_DATABASE: string;
+
         JWT_SECRET: string;
         JWT_EXPIRES_IN: string;
         JWT_REFRESH_SECRET: string;
         JWT_REFRESH_EXPIRES_IN: string;
-
     };
 };
 
@@ -40,12 +45,18 @@ export default (): Record<string, any> => ({
         Password: process.env.MARIADB_PASSWORD || '',
         Database: process.env.MARIADB_DATABASE || '',
     },
-  
+    POSTGRE: {
+        Host: process.env.POSTGRE_HOST || 'localhost',
+        Port: parseInt(process.env.POSTGRE_PORT, 10) || 5432,
+        Username: process.env.POSTGRE_USERNAME || 'root',
+        Password: process.env.POSTGRE_PASSWORD || '',
+        Database: process.env.POSTGRE_DATABASE || '',
+    },
+
     JWT: {
         Secret: process.env.JWT_SECRET || 'secret',
         ExpiresIn: process.env.JWT_EXPIRES_IN || 1 * 60 * 60,
         RefreshSecret: process.env.JWT_REFRESH_SECRET || 'secret',
         RefreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN || 30 * 24 * 60 * 60,
     },
-
 });

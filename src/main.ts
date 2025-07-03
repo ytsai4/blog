@@ -20,7 +20,7 @@ async function bootstrap(): Promise<void> {
     setupMiddlewares(app);
 
     // Enable Swagger only in development environment
-    const nodeEnv = process.env.NODE_ENV || 'development';
+    const nodeEnv = config.get<string>('NodeEnv') || 'development';
     if (nodeEnv === 'development') {
         setupSwagger(app);
         // logger.log('Swagger enabled at /api');
