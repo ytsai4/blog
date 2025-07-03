@@ -42,7 +42,7 @@ export class PostController {
         return createApiResponse(output);
     }
     @Public()
-    @Get('')
+    @Post('Search')
     @ApiOperation({ summary: '取得所有文章' })
     @ApiBody({ type: GetPostDto })
     @ApiResponse({ type: ApiResponseDto<PostWithLikes[]>, description: '取得文章列表成功' })
