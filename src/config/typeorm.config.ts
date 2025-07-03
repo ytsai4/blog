@@ -12,7 +12,7 @@ class TypeOrmConfig {
             password: db.Password,
             database: db.Database,
             subscribers: ['dist/**/*.subscriber{.ts,.js}'],
-            // synchronize: configService.get('NodeEnv') === 'development',
+            synchronize: configService.get('NodeEnv') === 'development',
             logging: configService.get('NodeEnv') === 'development' ? ['error', 'warn'] : false,
             autoLoadEntities: true,
             extra: {
