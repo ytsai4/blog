@@ -31,7 +31,7 @@ export class PostEntity extends AuditBaseEntity {
     })
     PublishDate: Date | null;
     @Index()
-    @Column({ name: 'CreateBy', type: 'uuid', comment: '作者 UUID' })
+    @Column({ name: 'CreateBy', type: 'varchar', comment: '作者 UUID' })
     CreateBy: string;
 
     @OneToMany(() => PostTagEntity, (postTag) => postTag.Post)

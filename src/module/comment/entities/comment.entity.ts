@@ -19,7 +19,7 @@ export class CommentEntity extends AuditBaseEntity {
         comment: '內文',
     })
     Content: string;
-    @Column({ name: 'CreateBy', type: 'uuid', comment: '留言者 UUID' })
+    @Column({ name: 'CreateBy', type: 'varchar', comment: '留言者 UUID' })
     CreateBy: string;
 
     @Column({ name: 'DeleteBy', type: 'uuid', comment: '刪除者 UUID', nullable: true })

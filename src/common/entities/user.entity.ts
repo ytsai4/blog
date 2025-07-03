@@ -55,9 +55,9 @@ export class UserEntity extends AuditBaseEntity {
     LastLoginDate: Date | null;
     @Column({ name: 'LastChangePwdDate', type: 'timestamp', nullable: true })
     LastChangePwdDate: Date | null;
-    @Column({ name: 'CreateBy', type: 'uuid', comment: '作者 UUID' })
+    @Column({ name: 'CreateBy', type: 'varchar', comment: '作者 UUID' })
     CreateBy: string;
-    @Column({ name: 'DeleteBy', type: 'uuid', comment: '刪除者', nullable: true })
+    @Column({ name: 'DeleteBy', type: 'varchar', comment: '刪除者', nullable: true })
     DeleteBy: string;
 
     @BeforeInsert()
