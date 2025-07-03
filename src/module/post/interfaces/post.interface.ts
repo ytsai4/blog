@@ -1,4 +1,4 @@
-import { CommentDto } from '@src/module/tag/dto/tag.dto';
+import { CommentDto } from '@src/module/comment/dto/comment.dto';
 import { PostDto } from '../dto/post.dto';
 
 export interface PostWithLikes extends PostDto {

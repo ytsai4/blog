@@ -10,7 +10,7 @@ import { createApiResponse } from '@src/common/utils/api-response.util';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { GetPostDto } from './dto/get-post.dto';
 import { PostWithComments, PostWithLikes } from './interfaces/post.interface';
-import { CommentService } from '../tag/tag.service';
+import { CommentService } from '../comment/comment.service';
 import { ApiStandardErrors } from '@src/common/decorators/swagger-api-errors.decorator';
 
 @ApiBearerAuth('access-token')
