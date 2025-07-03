@@ -28,8 +28,8 @@ async function bootstrap(): Promise<void> {
         // logger.log('Swagger disabled in production');
     }
 
-    const port = config.get<number>('port') || 3000;
-    const projectName = config.get<string>('projectName') || 'MyProject';
+    const port = config.get<number>('Port') || 3000;
+    const projectName = config.get<string>('ProjectName') || 'MyProject';
 
     try {
         await app.listen(port);
