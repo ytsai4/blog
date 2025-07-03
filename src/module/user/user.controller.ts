@@ -15,7 +15,7 @@ import { mapToDto } from '@src/common/utils/mapper';
 export class UserController {
     constructor(private readonly userService: UserService) {}
 
-    @Get('/ChangePassword')
+    @Post('/ChangePassword')
     @ApiOperation({ summary: '變更密碼' })
     @ApiBody({ type: ChangePasswordDto })
     @ApiResponse({ type: ApiResponseDto<{}>, description: '變更密碼成功' })
