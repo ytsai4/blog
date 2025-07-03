@@ -2,14 +2,15 @@ import { TypeOrmModuleAsyncOptions, TypeOrmModuleOptions } from '@nestjs/typeorm
 import { ConfigModule, ConfigService } from '@nestjs/config';
 class TypeOrmConfig {
     static getDatabaseConfig(configService: ConfigService): TypeOrmModuleOptions {
-        console.log('Database Host:', configService.get('POSTGRES.Host'));
+        const db = configService.get('POSTGRE');
+        console.log('Database Host:', db?.Host);
         return {
             type: 'postgres',
-            host: configService.get<string>('POSTGRES.Host'),
-            port: configService.get<number>('POSTGRES.Port'),
-            username: configService.get<string>('POSTGRES.Username'),
-            password: configService.get<string>('POSTGRES.Password'),
-            database: configService.get<string>('POSTGRES.Database'),
+            host: db.Host,
+            port: parseInt(db.Port, 10) || db.Port,
+            username: db.Username,
+            password: db.Password,
+            database: db.Database,
             subscribers: ['dist/**/*.subscriber{.ts,.js}'],
             synchronize: configService.get('NodeEnv') === 'development',
             logging: configService.get('NodeEnv') === 'development' ? ['error', 'warn'] : false,
