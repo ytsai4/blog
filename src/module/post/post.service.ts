@@ -25,8 +25,9 @@ import { GetPostDto } from './dto/get-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { CreatePostDto } from './dto/create-post.dto';
 import { LikeEntity } from './entities';
-import { PostWithLikes } from './interfaces/post.interface';
+import { PostLogWithTags, PostWithLikes } from './interfaces/post.interface';
 import { MetaDto } from '@src/common/dtos/api-response.dto';
+import { PostLogDto } from './dto/post-log.dto';
 @Injectable()
 export class PostService {
     constructor(
@@ -126,6 +127,54 @@ export class PostService {
 
         const outputData: PostDto = mapToDto(PostDto, postEntity);
 
+        return outputData;
+    }
+    async getPostLogByPost(UUID: string): Promise<PostLogWithTags[]> {
+        const where: FindOptionsWhere<PostLogEntity> = {
+            DeleteDate: IsNull(),
+            Post: UUID,
+        };
+        const queryOptions: FindManyOptions<PostLogEntity> = {
+            where,
+            order: {
+                PublishDate: 'DESC',
+            },
+        };
+
+        const postLogEntities = await this.postLogRepo.find(queryOptions);
+        if (postLogEntities.length === 0) return [];
+        const postTagLog = await this.postTagLogRepo.find({
+            where: {
+                Post: In(postLogEntities.map((log) => log.UUID)),
+            },
+        });
+        if (postTagLog.length === 0)
+            return postLogEntities.map((log) => ({
+                ...mapToDto(PostLogDto, log),
+                Tags: [],
+            }));
+        const tags = await this.tagRepo.find({
+            where: {
+                UUID: In(postTagLog.map((log) => log.Tag)),
+            },
+        });
+        // Map tag UUID -> tag name
+        const tagMap = new Map(tags.map((tag) => [tag.UUID, tag.TagName]));
+        // Map post UUID -> tag name[]
+        const postTagMap = new Map<string, string[]>();
+        for (const log of postTagLog) {
+            const tagName = tagMap.get(log.Tag);
+            if (!tagName) continue;
+
+            if (!postTagMap.has(log.Post)) {
+                postTagMap.set(log.Post, []);
+            }
+            postTagMap.get(log.Post)!.push(tagName);
+        }
+        const outputData: PostLogWithTags[] = postLogEntities.map((log) => ({
+            ...mapToDto(PostLogDto, log),
+            Tags: postTagMap.get(log.UUID) ?? [],
+        }));
         return outputData;
     }
     async countLikes(UUID: string): Promise<number> {

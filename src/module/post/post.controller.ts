@@ -9,7 +9,7 @@ import { RequestWithUUID } from '@src/common/interfaces/request.interface';
 import { createApiResponse } from '@src/common/utils/api-response.util';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { GetPostDto } from './dto/get-post.dto';
-import { PostWithComments, PostWithLikes } from './interfaces/post.interface';
+import { PostLogWithTags, PostWithComments, PostWithLikes } from './interfaces/post.interface';
 import { CommentService } from '../comment/comment.service';
 import { ApiStandardErrors } from '@src/common/decorators/swagger-api-errors.decorator';
 
@@ -21,7 +21,20 @@ export class PostController {
         private readonly postService: PostService,
         private readonly commentService: CommentService,
     ) {}
-
+    @Get('Log/Post/:UUID')
+    @ApiOperation({ summary: '取得文章編輯紀錄' })
+    @ApiParam({
+        name: 'UUID',
+        description: '文章UUID',
+        type: String,
+        required: true,
+    })
+    @ApiResponse({ type: ApiResponseDto<PostLogWithTags[]>, description: '取得文章編輯紀錄成功' })
+    @ApiStandardErrors()
+    async getLogs(@Param('UUID') UUID: string): Promise<ApiResponseDto<PostLogWithTags[]>> {
+        const post = await this.postService.getPostLogByPost(UUID);
+        return createApiResponse(post);
+    }
     @Public()
     @Get(':UUID')
     @ApiOperation({ summary: '取得特定文章' })
@@ -88,6 +101,7 @@ export class PostController {
         const post = await this.postService.update(body, req.UUID_User);
         return createApiResponse(post);
     }
+    @Public()
     @Delete(':UUID')
     @ApiOperation({ summary: '刪除文章' })
     @ApiParam({
