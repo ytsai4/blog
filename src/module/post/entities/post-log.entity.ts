@@ -13,14 +13,14 @@ export class PostLogEntity extends AuditBaseEntity {
     Post: string;
     @Column({
         name: 'Title',
-        type: 'nvarchar',
+        type: 'varchar',
         length: 200,
         comment: '標題',
     })
     Title: string;
     @Column({
         name: 'Content',
-        type: 'nvarchar',
+        type: 'varchar',
         length: 4000,
         comment: '內文',
     })

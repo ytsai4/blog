@@ -11,7 +11,7 @@ export class UserEntity extends AuditBaseEntity {
     UUID: string;
     @Column({
         name: 'UserName',
-        type: 'nvarchar',
+        type: 'varchar',
         length: 100,
         comment: '使用者帳號',
         unique: true,
@@ -20,7 +20,7 @@ export class UserEntity extends AuditBaseEntity {
 
     @Column({
         name: 'Intro',
-        type: 'nvarchar',
+        type: 'varchar',
         length: 255,
         comment: '介紹文字',
         default: '',
@@ -28,7 +28,7 @@ export class UserEntity extends AuditBaseEntity {
     Intro: string;
     @Column({
         name: 'Name',
-        type: 'nvarchar',
+        type: 'varchar',
         length: 100,
         comment: '名稱',
         default: '',
@@ -36,7 +36,7 @@ export class UserEntity extends AuditBaseEntity {
     Name: string;
     @Column({
         name: 'Password',
-        type: 'nvarchar',
+        type: 'varchar',
         length: 200,
         comment: '密碼',
     })
@@ -44,7 +44,7 @@ export class UserEntity extends AuditBaseEntity {
 
     @Column({
         name: 'Email',
-        type: 'nvarchar',
+        type: 'varchar',
         length: 200,
         comment: '信箱',
         default: '',

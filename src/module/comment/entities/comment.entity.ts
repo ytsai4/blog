@@ -14,7 +14,7 @@ export class CommentEntity extends AuditBaseEntity {
 
     @Column({
         name: 'Content',
-        type: 'nvarchar',
+        type: 'varchar',
         length: 4000,
         comment: '內文',
     })

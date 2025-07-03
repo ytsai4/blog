@@ -11,7 +11,7 @@ export class TagEntity extends AuditBaseEntity {
     UUID: string;
     @Column({
         name: 'TagName',
-        type: 'nvarchar',
+        type: 'varchar',
         length: 100,
         comment: '標籤名稱',
     })
